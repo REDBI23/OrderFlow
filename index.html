@@ -1,0 +1,113 @@
+!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrderFlow - Управление заказами</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
+        .header { background: #007bff; color: white; padding: 20px; text-align: center; }
+        .nav { background: #333; color: white; padding: 10px; text-align: center; }
+        .nav button { margin: 0 10px; padding: 10px 20px; background: #555; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .content { padding: 20px; max-width: 800px; margin: 0 auto; }
+        .card { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input, select { padding: 10px; width: 70%; }
+        button { padding: 10px 20px; margin: 5px; }
+        .delete-btn { background: #dc3545; color: white; }
+        .status { padding: 5px 12px; border-radius: 20px; font-size: 14px; margin-left: 10px; }
+        .status-new { background: #fef3c7; color: #d97706; }
+        .status-work { background: #dbeafe; color: #3b82f6; }
+        .status-done { background: #d1fae5; color: #10b981; }
+        .stats { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>OrderFlow</h1>
+        <p>Управление заказами</p>
+    </div>
+    <div class="nav">
+        <button onclick="showSection('orders')">Заказы</button>
+        <button onclick="showSection('stats')">Статистика</button>
+    </div>
+    <div class="content">
+        <div class="stats" id="stats">Заказов: 0 | Сумма: 0 ₽</div>
+        
+        <div id="orders" class="section">
+            <h2>Заказы</h2>
+            <input type="text" id="order-client" placeholder="Клиент">
+            <input type="text" id="order-item" placeholder="Товар">
+            <input type="number" id="order-amount" placeholder="Сумма">
+            <select id="order-status">
+                <option value="new">Новый</option>
+                <option value="work">В работе</option>
+                <option value="done">Завершён</option>
+            </select>
+            <button onclick="addOrder()">Добавить заказ</button>
+            <div id="orders-list"></div>
+        </div>
+        <div id="stats" class="section" style="display:none;">
+            <h2>Статистика</h2>
+            <div id="stats-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.getElementById(section).style.display = 'block';
+        }
+
+        function addOrder() {
+            const client = document.getElementById("order-client").value.trim();
+            const item = document.getElementById("order-item").value.trim();
+            const amount = parseFloat(document.getElementById("order-amount").value);
+            const status = document.getElementById("order-status").value;
+
+            if (client && item && amount) {
+                orders.push({ client, item, amount, status });
+                localStorage.setItem("orders", JSON.stringify(orders));
+                renderOrders();
+                updateStats();
+                document.getElementById("order-client").value = "";
+                document.getElementById("order-item").value = "";
+                document.getElementById("order-amount").value = "";
+            }
+        }
+
+        function renderOrders() {
+            const list = document.getElementById("orders-list");
+            list.innerHTML = orders.map((o, i) => {
+                let statusText = o.status === 'new' ? 'Новый' : o.status === 'work' ? 'В работе' : 'Завершён';
+                return `<div class="card">Клиент: ${o.client} | Товар: ${o.item} | Сумма: ${o.amount} ₽ 
+                <span class="status status-$
+
+
+o.status}">${statusText}</span>
+                <button class="delete-btn" onclick="deleteOrder(${i})">Удалить</button></div>`;
+            }).join("");
+        }
+
+        function deleteOrder(i) {
+            orders.splice(i, 1);
+            localStorage.setItem("orders", JSON.stringify(orders));
+            renderOrders();
+            updateStats();
+        }
+
+        function updateStats() {
+            const total = orders.reduce((sum, o) => sum + o.amount, 0);
+            document.getElementById("stats").innerHTML = `Заказов: ${orders.length} | Сумма: ${total} ₽`;
+        }
+
+        renderOrders();
+        updateStats();
+    </script>
+</body>
+</html>{
+
+
+
+
